@@ -1,3 +1,3 @@
-# prep-stock-api (Restaurant Prep API)
+# prep-stock-api
 ## Why this project
 ## Tech stack
