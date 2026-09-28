@@ -5,16 +5,15 @@
 
 ##  把 main:app 打成 main:ap 再啟動
     由於在main.py裡面是通過 app = FastAPI() 來建立的, 所以uvicorn 會照著 main:ap 去 main.py 裡找一個叫 ap 的變數，找不到就會報錯
-    解決方法:在使用ap時則無法運行FastAPI,改成ap = FastAPI() 和 @ap.get("/health"),這樣的話就沒問題了
+    解決方法:把指令改回main:app或在main.py改成ap = FastAPI() 和 @ap.get("/health"),這樣的話就沒問題了
 
 ##  在 main.py 故意漏一個冒號或括號
     會因SyntaxError而無法執行main.py,
-    解決方法:修改main.py的語法錯誤
+    解決方法:錯誤訊息會顯示第幾行，並用 ^ 標出位置，照著去改。
 
 ##  開兩個終端機，兩邊都跑 uvicorn → 第二個報什麼錯？（提示：port 被佔用）
     無法同時使用:8000
-    解決方法:只需要關掉一個或是把另外一個改成:8000之外的接口即可
-
+    解決方法:只需要關掉一個或是把另外一個改成:8000之外的接口即可,例:uvicorn main:app --reload --port 8001
 
 ##  把回傳改成 {"status": "ok", "service": "prep-stock-api"}，不重啟，直接刷新瀏覽器 
     驗證成功 --reload 有用, 所以--reload的用處體現在檔案有所變更時,不需要重開伺服器也可以更新到最新的版本
