@@ -8,6 +8,7 @@
     會因SyntaxError而無法執行main.py
 
 ##  開兩個終端機，兩邊都跑 uvicorn → 第二個報什麼錯？（提示：port 被佔用）
+    無法同時使用:8000
 
 
 ##  把回傳改成 {"status": "ok", "service": "prep-stock-api"}，不重啟，直接刷新瀏覽器 
