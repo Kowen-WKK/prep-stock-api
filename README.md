@@ -21,4 +21,4 @@ TBD
 TBD
 
 ## Project status
-In progress — week 1 of 26.
+In progress — week 3 of 26.
