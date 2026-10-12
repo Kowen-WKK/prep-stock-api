@@ -18,7 +18,12 @@ Python, FastAPI, PostgreSQL
 TBD
 
 ## API endpoints
-TBD
+| Method | Path | Description | Success | Errors |
+|---|---|---|---|---|
+| GET | /health | Check that the service is running | 200 | — |
+| GET | /items | List all items | 200 | — |
+| POST | /items | Create a new item | 201 | 422 Invalid input |
+| GET | /items/{id} | Get a single item by ID | 200 | 404 Item not found |
 
 ## Project status
 In progress — week 3 of 26.
