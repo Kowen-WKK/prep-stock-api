@@ -24,6 +24,8 @@ TBD
 | GET | /items | List all items | 200 | — |
 | POST | /items | Create a new item | 201 | 422 Invalid input |
 | GET | /items/{id} | Get a single item by ID | 200 | 404 Item not found |
+| PUT | /items/{id} | Replace an item's name and quantity (ID stays the same) | 200 | 404 Item not found, 422 Invalid input |
+| DELETE | /items/{id} | Delete an item | 204 | 404 Item not found |
 
 ## Project status
-In progress — week 3 of 26.
+In progress — week 4 of 26.
