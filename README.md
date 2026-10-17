@@ -64,6 +64,8 @@ If `psql` is not recognised on Windows, add `C:\Program Files\PostgreSQL\17\bin`
 | GET | /items | List all items | 200 | — |
 | POST | /items | Create a new item | 201 | 422 Invalid input |
 | GET | /items/{id} | Get a single item by ID | 200 | 404 Item not found |
+| PUT | /items/{id} | Replace an item's name and quantity (ID stays the same) | 200 | 404 Item not found, 422 Invalid input |
+| DELETE | /items/{id} | Delete an item | 204 | 404 Item not found |
 
 ## Project status
 In progress — week 5 of 26.
