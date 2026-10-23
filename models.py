@@ -1,8 +1,15 @@
-from pydantic import BaseModel, Field
+from datetime import datetime
+from decimal import Decimal
+from sqlalchemy import Numeric, Text, DateTime, func
+from sqlalchemy.orm import Mapped, mapped_column
+from database import Base
 
-class ItemCreate(BaseModel):   # 對方送進來的
-    name: str = Field(min_length=1, max_length=50)
-    quantity: float = Field(ge=0)
+class Item(Base):
+    __tablename__ = "items"
 
-class Item(ItemCreate):        # 你存起來、回傳出去的
-    id: int
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    quantity: Mapped[Decimal] = mapped_column(Numeric, default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
