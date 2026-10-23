@@ -17,45 +17,47 @@ Python, FastAPI, PostgreSQL
 ## Getting Started
 
 ### Prerequisites
-
 - Python 3.12
 - PostgreSQL 17
 - Git
 
 ### 1. Clone the repository
-
-```bash
+​```bash
 git clone https://github.com/<your-username>/prep-stock-api.git
 cd prep-stock-api
-```
+​```
 
-### 2. Create a virtual environment and install dependencies
+### 2. Create and activate a virtual environment
+​```bash
+python -m venv venv
+venv\Scripts\activate        # Windows
+source venv/bin/activate     # macOS / Linux
+​```
 
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1        # Windows (PowerShell)
-# source .venv/bin/activate       # macOS / Linux
+### 3. Install dependencies
+​```bash
 pip install -r requirements.txt
-```
+​```
 
-### 3. Run the API
+### 4. Create the database
+Open `psql` (or pgAdmin) and run:
+​```sql
+CREATE DATABASE <database_name>;
+​```
 
-```bash
-uvicorn main:app --reload
-```
+### 5. Configure environment variables
+Copy the example file and fill in your own PostgreSQL password:
+​```bash
+copy .env.example .env       # Windows
+cp .env.example .env         # macOS / Linux
+​```
 
-Then open http://127.0.0.1:8000/docs to try the endpoints in the browser.
+### 6. Run the server
+​```bash
+uvicorn <main:app> --reload
+​```
 
-### 4. Set up the database
-
-> **Note:** The API currently stores data in memory. Database integration is the next milestone — this step prepares the schema ahead of time.
-
-```bash
-psql -U postgres -c "CREATE DATABASE prep_stock;"
-psql -U postgres -d prep_stock -f sql/01_create_items.sql
-```
-
-If `psql` is not recognised on Windows, add `C:\Program Files\PostgreSQL\17\bin` to your PATH and reopen the terminal.
+Open http://localhost:8000/docs to try the API.
 
 ## API endpoints
 | Method | Path | Description | Success | Errors |
@@ -68,4 +70,4 @@ If `psql` is not recognised on Windows, add `C:\Program Files\PostgreSQL\17\bin`
 | DELETE | /items/{id} | Delete an item | 204 | 404 Item not found |
 
 ## Project status
-In progress — week 5 of 26.
+In progress — week 6 of 26.
