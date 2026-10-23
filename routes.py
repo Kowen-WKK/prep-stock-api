@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from models import Item, ItemCreate
+from schemas import Item, ItemCreate
 
 router = APIRouter(prefix="/items", tags=["items"])
 
