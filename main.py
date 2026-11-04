@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from routes import router as items_router
 from routes_usage import router as usage_router
-import models
 
 app = FastAPI()
 
