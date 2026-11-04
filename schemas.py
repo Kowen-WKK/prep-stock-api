@@ -29,3 +29,9 @@ class UsageOut(BaseModel):         # API 回傳出去的
     quantity: int
 
     model_config = {"from_attributes": True}
+
+class UsageWithItem(BaseModel):
+    used_on: date
+    name: str
+    quantity: int
+    unit: str
