@@ -33,7 +33,7 @@ def find_item_or_404(db: Session, item_id: int) -> Item:
         raise HTTPException(status_code=404, detail="Item not found")
     return item
 
-@router.put("/items/{item_id}", response_model=ItemOut)
+@router.put("/{item_id}", response_model=ItemOut)
 def update_item(item_id: int, data: ItemCreate, db: Session = Depends(get_db)):
     item = db.get(Item, item_id)
     if item is None:
