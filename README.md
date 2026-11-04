@@ -5,14 +5,15 @@ Helps restaurant kitchens avoid running out of ingredients by suggesting daily p
 ## Why this project
 A busy restaurant kitchen can serve over 500 customers a day while tracking around 35 stock lines. How much of each item to prep is usually decided by senior staff based on experience. If they underestimate, there may be no time to reorder, and a dish has to come off the menu. prep-stock-api records daily usage and suggests how much to prep, based on recent usage, current stock and a safety level for each item.
 
-## Features (planned)
-- Add, view, update and delete stock items
-- Set a safety stock level for each item
-- Record daily usage
-- Suggest how much to prep each day
+## Features
+- [x] Add, view, update and delete stock items
+- [x] Set a unit and a safety stock level for each item
+- [x] Record daily usage
+- [x] View usage history for an item over a date range
+- [ ] Suggest how much to prep each day
 
 ## Tech stack
-Python, FastAPI, PostgreSQL
+Python, FastAPI, SQLAlchemy 2.0, PostgreSQL, Alembic
 
 ## Getting Started
 
@@ -64,10 +65,33 @@ Open http://localhost:8000/docs to try the API.
 |---|---|---|---|---|
 | GET | /health | Check that the service is running | 200 | — |
 | GET | /items | List all items | 200 | — |
-| POST | /items | Create a new item | 201 | 422 Invalid input |
+| POST | /items | Create a new item (`unit` defaults to `bag`, `safety_stock` to 0) | 201 | 422 Invalid input |
 | GET | /items/{id} | Get a single item by ID | 200 | 404 Item not found |
-| PUT | /items/{id} | Replace an item's name and quantity (ID stays the same) | 200 | 404 Item not found, 422 Invalid input |
+| PUT | /items/{id} | Replace an item's name, quantity, unit and safety stock (ID stays the same) | 200 | 404 Item not found, 422 Invalid input |
 | DELETE | /items/{id} | Delete an item | 204 | 404 Item not found |
+| POST | /usage | Record today's usage for an item (the date is set by the server) | 201 | 404 Item not found, 422 Invalid input |
+| GET | /usage | List an item's usage over a date range, with item name and unit | 200 | 400 `start` is after `end`, 404 Item not found, 422 Invalid input |
+
+### GET /usage query parameters
+| Parameter | Required | Default | Example |
+|---|---|---|---|
+| `item_id` | Yes | — | `1` |
+| `start` | No | 6 days before `end` | `2026-11-01` |
+| `end` | No | Today | `2026-11-07` |
+
+With no dates, it returns the last 7 days including today. Results are sorted by date. An item with no usage in the range returns an empty list.
+
+## Design decisions
+- **Usage is counted in whole bags.** Ingredients arrive from the central kitchen already packed, and an opened bag counts as one bag used, so `quantity` is an integer.
+- **Staff can only record usage for today.** `POST /usage` does not accept a date; the server sets it. The rule lives in the API, not the database, so a future manager feature can add past records without changing the table.
+- **Quantity must be greater than 0.** Checked twice: by Pydantic (returns 422) and by a database `CHECK` constraint (protects data written outside the API).
+- **The API checks the item exists before saving usage.** The foreign key would also block it, but that surfaces as a 500 error; checking first returns a clear 404.
+
+## Out of scope (for now)
+- **Manager permissions (correcting or back-filling usage).** Regular staff can only record today's usage. When a record is wrong or a day was missed, a manager would need to correct the record or add one for a past date. This needs login and role-based permissions, which are outside the current scope.
+
+## Known issues
+- Deleting an item that already has usage records returns 500, because the foreign key blocks the delete. Planned fix: decide between deleting its usage too, or refusing with 409 Conflict.
 
 ## Project status
-In progress — week 6 of 26.
+In progress — week 8 of 26.
