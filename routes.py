@@ -27,27 +27,26 @@ def create_item(payload: ItemCreate, db: Session = Depends(get_db)):
     db.refresh(item)  # 從資料庫拿回自動產生的 id
     return item
 
-items_db = []
+def find_item_or_404(db: Session, item_id: int) -> Item:
+    item = db.get(Item, item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return item
 
-def find_item_or_404(item_id: int):
-    # 在 items 裡找，找到就 return
-    for item in items_db:
-        if item.id == item_id:
-            return item
-    # 找不到就 raise HTTPException(status_code=404, ...)
-    raise HTTPException(status_code=404, detail="Item not found")
-
-@router.put("/{item_id}", response_model=ItemOut)
-def update_item(item_id: int, payload: ItemCreate):
-    item = find_item_or_404(item_id)
-    # 用 payload 的內容更新這筆，id 保持不變
-    for key, value in payload.model_dump().items():
-        setattr(item, key, value)
-    # return 更新後的那筆
+@router.put("/items/{item_id}", response_model=ItemOut)
+def update_item(item_id: int, data: ItemCreate, db: Session = Depends(get_db)):
+    item = db.get(Item, item_id)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    for key, value in data.model_dump().items():
+        setattr(item, key, value)   # 把新值一個個蓋上去
+    db.commit()
+    db.refresh(item)
     return item
 
 @router.delete("/{item_id}", status_code=204)
-def delete_item(item_id: int):
-    item = find_item_or_404(item_id)
+def delete_item(item_id: int, db: Session = Depends(get_db)):
+    item = find_item_or_404(db,item_id)
     # 從 items 移除；不用 return'
-    items_db.remove(item)
+    db.delete(item)
+    db.commit()
