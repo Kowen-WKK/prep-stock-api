@@ -21,7 +21,7 @@ def get_item(item_id: int, db: Session = Depends(get_db)):
 
 @router.post("", response_model=ItemOut, status_code=201)
 def create_item(payload: ItemCreate, db: Session = Depends(get_db)):
-    item = Item(name=payload.name, quantity=payload.quantity)
+    item = Item(**payload.model_dump())
     db.add(item)      # 放進「訂單」
     db.commit()       # 簽名送出，這一刻才真正寫入
     db.refresh(item)  # 從資料庫拿回自動產生的 id
