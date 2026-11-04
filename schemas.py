@@ -11,3 +11,5 @@ class ItemOut(BaseModel):
     name: str
     quantity: float
     created_at: datetime
+    unit: str
+    safety_stock: int
