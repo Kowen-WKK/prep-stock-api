@@ -47,15 +47,21 @@ CREATE DATABASE <database_name>;
 ```
 
 ### 5. Configure environment variables
-Copy the example file and fill in your own PostgreSQL password:
+Copy the example file, then open `.env` and fill in your PostgreSQL username, password and the database name you created in step 4:
 ```bash
 copy .env.example .env       # Windows
 cp .env.example .env         # macOS / Linux
 ```
 
-### 6. Run the server
+### 6. Create the tables
+Apply the database migrations with Alembic. This creates the `items` and `usage` tables:
 ```bash
-uvicorn <main:app> --reload
+alembic upgrade head
+```
+
+### 7. Run the server
+```bash
+uvicorn main:app --reload
 ```
 
 Open http://localhost:8000/docs to try the API.
@@ -80,6 +86,27 @@ Open http://localhost:8000/docs to try the API.
 | `end` | No | Today | `2026-11-07` |
 
 With no dates, it returns the last 7 days including today. Results are sorted by date. An item with no usage in the range returns an empty list.
+
+## Data model
+
+### items
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | Primary key |
+| `name` | text | Item name |
+| `quantity` | integer | Current stock |
+| `unit` | text | Defaults to `bag` |
+| `safety_stock` | integer | Minimum level to keep in stock; defaults to 0 |
+
+### usage
+| Column | Type | Notes |
+|---|---|---|
+| `id` | integer | Primary key |
+| `item_id` | integer | Foreign key to `items.id` |
+| `date` | date | Set by the server to today |
+| `quantity` | integer | Bags used; must be greater than 0 |
+
+One item can have many usage records (one-to-many).
 
 ## Design decisions
 - **Usage is counted in whole bags.** Ingredients arrive from the central kitchen already packed, and an opened bag counts as one bag used, so `quantity` is an integer.
