@@ -1,10 +1,11 @@
 from database import get_db
-from models import Item
+from models import Item, Usage
 from schemas import ItemCreate, ItemOut
 
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -47,6 +48,10 @@ def update_item(item_id: int, data: ItemCreate, db: Session = Depends(get_db)):
 @router.delete("/{item_id}", status_code=204)
 def delete_item(item_id: int, db: Session = Depends(get_db)):
     item = find_item_or_404(db,item_id)
-    # 從 items 移除；不用 return'
+
+    has_usage = db.query(Usage).filter(Usage.item_id == item_id).first()
+    if has_usage is not None:
+            raise HTTPException(status_code=409, detail="Item has usage records and cannot be deleted")
+    
     db.delete(item)
     db.commit()
