@@ -37,3 +37,18 @@ class UsageWithItem(BaseModel):
     name: str
     quantity: int
     unit: str
+
+
+class SuggestionItem(BaseModel):
+    item_id: int
+    name: str
+    unit: str
+    avg_usage: float | None      # 8 週內沒紀錄 → null
+    days_used: int
+    based_on_dates: list[date]
+
+
+class SuggestionsOut(BaseModel):
+    target_date: date
+    day_type: str                # "saturday" 或 "other"
+    items: list[SuggestionItem]
