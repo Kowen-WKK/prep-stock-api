@@ -5,6 +5,7 @@ from models import Item, Usage
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from schemas import UsageCreate, UsageOut,UsageWithItem
+from utils import today_london
 
 router = APIRouter(prefix="/usage", tags=["usage"])
 
@@ -12,23 +13,31 @@ router = APIRouter(prefix="/usage", tags=["usage"])
 @router.post("", response_model=UsageOut, status_code=status.HTTP_201_CREATED)
 def create_usage(payload: UsageCreate, db: Session = Depends(get_db)):
     # 1. 先確認品項存在
-    item = db.get(Item, payload.item_id)
+    item = db.query(Item).filter(Item.id == payload.item_id).with_for_update().first()
     if item is None:
         raise HTTPException(status_code=404, detail="Item not found")
 
     # 2. 建立紀錄：日期由系統決定，只能是今天
-    usage = Usage(
-        item_id=payload.item_id,
-        quantity=payload.quantity,
-        used_on=date.today(),
-    )
+    usage = Usage(item_id=item.id, quantity=payload.quantity, used_on=today_london())
+    db.add(usage)
+    item.quantity = max(item.quantity - payload.quantity, 0)
 
     # 3. 存進資料庫
-    db.add(usage)
-    db.commit()
-    db.refresh(usage)
+    try:
+        # raise Exception("test")
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
-    return usage
+    db.refresh(usage)        # 拿到資料庫給的 id
+    return {
+        "id": usage.id,
+        "item_id": usage.item_id,
+        "quantity": usage.quantity,
+        "used_on": usage.used_on,
+        "stock_after": item.quantity,
+    }
 
 @router.get("", response_model=list[UsageWithItem])
 def list_usage(
@@ -38,7 +47,7 @@ def list_usage(
     db: Session = Depends(get_db),
 ):
     # 1. 日期沒給就用預設值
-    end = end or date.today()
+    end = end or today_london()
     start = start or end - timedelta(days=6)
 
     # 2. 檢查 start 不能晚於 end
