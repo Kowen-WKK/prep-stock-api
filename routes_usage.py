@@ -24,7 +24,6 @@ def create_usage(payload: UsageCreate, db: Session = Depends(get_db)):
 
     # 3. 存進資料庫
     try:
-        # raise Exception("test")
         db.commit()
     except Exception:
         db.rollback()
