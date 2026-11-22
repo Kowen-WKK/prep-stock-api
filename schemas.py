@@ -27,6 +27,7 @@ class UsageOut(BaseModel):         # API 回傳出去的
     item_id: int
     used_on: date
     quantity: int
+    stock_after: int
 
     model_config = {"from_attributes": True}
 
